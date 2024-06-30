@@ -65,8 +65,12 @@ pub struct SimpleString(pub(crate) String);
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub struct SimpleError(pub(crate) String);
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
+
+
 pub struct BulkString(pub(crate) Vec<u8>);
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
+
+
 pub struct RespNull;
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct RespArray(pub(crate) Vec<RespFrame>);
