@@ -1,8 +1,7 @@
 use std::fmt::Debug;
 
 use crate::{
-    cmd::{Command, CommandExecutor},
-    Backend, RespDecode, RespEncode, RespError, RespFrame,
+    cmd::{Command, CommandExecutor}, Backend, RespDecode, RespEncode, RespError, RespFrame
 };
 use anyhow::Result;
 use tokio::net::TcpStream;

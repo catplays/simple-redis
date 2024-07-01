@@ -1,5 +1,4 @@
-
-use crate::{Backend, RespArray, RespFrame, RespMap, };
+use crate::{Backend, RespArray, RespFrame, RespMap};
 
 use super::{
     extract_args, validate_command, CommandError, CommandExecutor, HGet, HGetAll, HSet, RESP_OK,
@@ -7,33 +6,33 @@ use super::{
 
 impl CommandExecutor for HGet {
     fn execute(self, backend: &Backend) -> RespFrame {
-         match backend.hget(&self.key, &self.field) {
-           Some(value) => value,
-           None => RespFrame::Null(crate::RespNull),
-       }
+        match backend.hget(&self.key, &self.field) {
+            Some(value) => value,
+            None => RespFrame::Null(crate::RespNull),
+        }
     }
 }
 
 impl CommandExecutor for HSet {
     fn execute(self, backend: &Backend) -> RespFrame {
-         backend.hset(self.key, self.field, self.value);
-         RESP_OK.clone()
+        backend.hset(self.key, self.field, self.value);
+        RESP_OK.clone()
     }
 }
 
 impl CommandExecutor for HGetAll {
     fn execute(self, backend: &Backend) -> RespFrame {
-    let hmap = backend.hmap.get(&self.key);
-      match hmap {
-        Some(hmap) =>  {
-            let mut map = RespMap::new();
-            for v in hmap.iter() {
-                map.insert(v.key().clone(), v.value().clone());
+        let hmap = backend.hmap.get(&self.key);
+        match hmap {
+            Some(hmap) => {
+                let mut map = RespMap::new();
+                for v in hmap.iter() {
+                    map.insert(v.key().clone(), v.value().clone());
+                }
+                map.into()
             }
-            map.into()
+            None => RespArray::new([]).into(),
         }
-        None => RespArray::new([]).into(),
-      }
     }
 }
 
@@ -60,15 +59,15 @@ impl TryFrom<RespArray> for HSet {
 
     fn try_from(value: RespArray) -> Result<Self, Self::Error> {
         validate_command(&value, &["hset"], 3)?;
-          let mut args = extract_args(value, 1)?.into_iter();
+        let mut args = extract_args(value, 1)?.into_iter();
         match (args.next(), args.next(), args.next()) {
-            (Some(RespFrame::BulkString(key)), 
-            Some(RespFrame::BulkString(field)),
-            Some(value))=> Ok(HSet {
-                key: String::from_utf8(key.0)?,
-                field: String::from_utf8(field.0)?,
-                value: value,
-            }),
+            (Some(RespFrame::BulkString(key)), Some(RespFrame::BulkString(field)), Some(value)) => {
+                Ok(HSet {
+                    key: String::from_utf8(key.0)?,
+                    field: String::from_utf8(field.0)?,
+                    value: value,
+                })
+            }
             _ => Err(CommandError::InvalidArgument(
                 "Invalid key or field".to_string(),
             )),
@@ -90,8 +89,6 @@ impl TryFrom<RespArray> for HGetAll {
         }
     }
 }
-
- 
 
 #[cfg(test)]
 mod tests {
@@ -115,7 +112,6 @@ mod tests {
         Ok(())
     }
 
-
     #[test]
     fn test_hset_from_resp_array() -> Result<()> {
         let mut buf = BytesMut::new();
@@ -130,7 +126,6 @@ mod tests {
 
         Ok(())
     }
-
 
     #[test]
     fn test_hgetall_from_resp_array() -> Result<()> {

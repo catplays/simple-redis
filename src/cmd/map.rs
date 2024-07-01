@@ -57,11 +57,13 @@ impl TryFrom<RespArray> for Set {
     }
 }
 
+
+#[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{Backend, RespDecode};
-    use anyhow::Result;
     use bytes::BytesMut;
+    use anyhow::Result;
+    use crate::{cmd::{CommandExecutor, Get, Set, RESP_OK}, Backend, RespArray, RespDecode, RespFrame};
+
 
     #[test]
     fn test_get_from_resp_array() -> Result<()> {
